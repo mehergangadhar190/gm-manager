@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GM Manager</title>
+
+<style>
+:root {
+  --bg: #0b110d;
+  --card: #141c17;
+  --card2: #19231c;
+  --text: #f4f7f4;
+  --muted: #9aa69d;
+  --accent: #28c76f;
+  --line: #29352d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+}
+
+.app {
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+.top {
+  padding: 22px 18px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: #176b36;
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.brand p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+main {
+  max-width: 900px;
+  margin: auto;
+  padding: 18px;
+}
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
+
+.hero {
+  background: linear-gradient(135deg, #173b25, #121a15);
+  border: 1px solid #285037;
+  border-radius: 24px;
+  padding: 24px;
+  margin-bottom: 16px;
+}
+
+.hero h2 {
+  margin: 0 0 8px;
+  font-size: 30px;
+}
+
+.hero p {
+  color: #b7c3ba;
+  line-height: 1.5;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 17px;
+}
+
+.card h3 {
+  margin: 0 0 7px;
+}
+
+.card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+  font-size: 13px;
+}
+
+.section {
+  margin-top: 22px;
+}
+
+.section h2 {
+  font-size: 19px;
+  margin-bottom: 12px;
+}
+
+.btn {
+  border: 0;
+  border-radius: 13px;
+  padding: 12px 16px;
+  background: var(--accent);
+  color: #06100a;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn.secondary {
+  background: var(--card2);
+  color: white;
+  border: 1px solid var(--line);
+}
+
+.row {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.upload {
+  display: block;
+  border: 1px dashed #48604f;
+  background: var(--card);
+  border-radius: 18px;
+  padding: 20px;
+  text-align: center;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.upload input {
+  display: none;
+}
+
+.preview {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+  margin-top: 12px;
+}
+
+.photo {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+}
+
+.field {
+  margin: 12px 0;
+}
+
+.field label {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.field input,
+.field textarea,
+.field select {
+  width: 100%;
+  background: #0f1712;
+  color: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.field textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.result {
+  margin-top: 14px;
+  background: var(--card2);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px;
+  line-height: 1.55;
+}
+
+.tag {
+  display: inline-block;
+  padding: 6px 9px;
+  margin: 6px 5px 0 0;
+  border-radius: 999px;
+  background: #21372a;
+  color: #9ee7b8;
+  font-size: 12px;
+}
+
+.list {
+  display: grid;
+  gap: 9px;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  background: var(--card);
+  border: 1px solid var(--line);
+  padding: 13px;
+  border-radius: 14px;
+}
+
+.item small {
+  display: block;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.notice {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 12px;
+}
+
+.nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #111a14;
+  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  z-index: 10;
+}
+
+.nav button {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  padding: 12px 4px;
+  font-size: 11px;
+}
+
+.nav button span {
+  display: block;
+  font-size: 21px;
+  margin-bottom: 3px;
+}
+
+.nav button.active {
+  color: white;
+}
+
+.nav button.active span {
+  color: var(--accent);
+}
+
+@media (min-width: 700px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  main {
+    padding: 28px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header class="top">
+  <div class="brand">
+    <div class="logo">✦</div>
+    <div>
+      <h1>GM Manager</h1>
+      <p>Your personal Instagram & content manager</p>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section id="home" class="page active">
+
+  <div class="hero">
+    <h2>Welcome to GM Manager</h2>
+    <p>
+      Your personal Instagram and social-media manager for content,
+      photos, captions, Stories, Collages, Highlights, planning and strategy.
+    </p>
+
+    <button class="btn" onclick="openPage('content')">
+      AI Post Suggestions
+    </button>
+  </div>
+
+  <div class="grid">
+
+    <div class="card">
+      <h3>📸 Photo Studio</h3>
+      <p>
+        Review your photos and get natural pose, composition and editing guidance.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>🧠 AI Post Suggestions</h3>
+      <p>
+        Choose photos and get recommendations for your post.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>📅 Planner</h3>
+      <p>
+        Organize posts, Reels, Stories and future content.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>📖 Stories & Collage</h3>
+      <p>
+        Plan Stories and create simple photo collage layouts.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>⭐ Highlights Manager</h3>
+      <p>
+        Organize Highlight categories and ideas.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>📊 Analytics</h3>
+      <p>
+        Keep track of performance and use real Instagram Insights when available.
+      </p>
+    </div>
+
+  </div>
+
+  <div class="section">
+    <h2>What GM can help decide</h2>
+
+    <div class="card">
+      <p>
+        🏆 Best photo<br>
+        🧍 Natural pose suggestion<br>
+        🎨 Aesthetic recommendation<br>
+        🎵 Music suggestion<br>
+        ✍️ Caption writing<br>
+        ⏰ Best posting-time guidance
+      </p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>GM Personal Style</h2>
+
+    <div class="card">
+      <p>
+        Natural • Premium • Simple • Clean • Professional
+      </p>
+      <p style="margin-top:10px">
+        GM should preserve facial identity, face structure and body proportions
+        and avoid artificial-looking transformations.
+      </p>
+    </div>
+  </div>
+
+</section>
+
+
+<section id="content" class="page">
+
+  <div class="section">
+    <h2>AI Post Suggestions</h2>
+
+    <label class="upload">
+      📷 Tap here to choose photos
+
+      <input
+        id="photos"
+        type="file"
+        accept="image/*"
+        multiple
+      >
+    </label>
+
+    <div id="preview" class="preview"></div>
+
+    <div class="field">
+      <label>Post mood</label>
+
+      <select id="mood">
+        <option>Natural & Premium</option>
+        <option>Simple & Clean</option>
+        <option>Professional</option>
+        <option>Casual & Warm</option>
+        <option>Elegant</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>What is the post about?</label>
+
+      <input
+        id="topic"
+        placeholder="Example: outfit, travel, portrait, coffee"
+      >
+    </div>
+
+    <div class="row">
+      <button class="btn" onclick="recommend()">
+        Get GM Recommendation
+      </button>
+
+      <button class="btn secondary" onclick="clearPhotos()">
+        Clear
+      </button>
+    </div>
+
+    <div
+      id="recommendation"
+      class="result"
+      style="display:none"
+    ></div>
+
+    <div class="notice">
+      This first website version works locally in your browser.
+      It does not pretend to access private Instagram data or perform
+      AI image editing that has not actually been connected.
+    </div>
+  </div>
+
+
+  <div class="section">
+
+    <h2>Caption Studio</h2>
+
+    <div class="field">
+      <label>Post topic</label>
+
+      <textarea
+        id="captionTopic"
+        placeholder="Describe the photo or post..."
+      ></textarea>
+    </div>
+
+    <button class="btn" onclick="createCaption()">
+      Create Caption
+    </button>
+
+    <div
+      id="captionResult"
+      class="result"
+      style="display:none"
+    ></div>
+
+  </div>
+
+</section>
+
+
+<section id="planner" class="page">
+
+  <div class="section">
+
+    <h2>Content Planner</h2>
+
+    <div class="field">
+      <label>Content</label>
+
+      <input
+        id="planTitle"
+        placeholder="Post / Reel / Story / Collage"
+      >
+    </div>
+
+    <div class="field">
+      <label>Date</label>
+
+      <input id="planDate" type="date">
+    </div>
+
+    <div class="field">
+      <label>Note</label>
+
+      <input
+        id="planNote"
+        placeholder="Caption, music, outfit or idea"
+      >
+    </div>
+
+    <button class="btn" onclick="addPlan()">
+      Add to Planner
+    </button>
+
+  </div>
+
+  <div class="section">
+
+    <div id="plans" class="list"></div>
+
+  </div>
+
+</section>
+
+
+<section id="profile" class="page">
+
+  <div class="section">
+
+    <h2>Personal Style Profile</h2>
+
+    <div class="field">
+      <label>Name / profile label</label>
+
+      <input
+        id="profileName"
+        placeholder="Your profile"
+      >
+    </div>
+
+    <div class="field">
+      <label>Style</label>
+
+      <select id="profileStyle">
+        <option>Natural · Premium · Simple · Clean · Professional</option>
+        <option>Natural · Casual · Clean</option>
+        <option>Professional · Premium · Clean</option>
+        <option>Simple · Elegant · Natural</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Communication / caption style</label>
+
+      <textarea
+        id="profileTone"
+        placeholder="Example: short, natural, confident and simple"
+      ></textarea>
+    </div>
+
+    <div class="field">
+      <label>Clothing preferences</label>
+
+      <textarea
+        id="profileClothes"
+        placeholder="Your normal clothing and styling preferences"
+      ></textarea>
+    </div>
+
+    <button class="btn" onclick="saveProfile()">
+      Save Profile
+    </button>
+
+    <div id="profileSaved" class="notice"></div>
+
+  </div>
+
+
+  <div class="section">
+
+    <h2>Stories</h2>
+
+    <div class="card">
+      <p>
+        <b>Story 1:</b> Strong opening image<br>
+        <b>Story 2:</b> Natural moment / behind the scenes<br>
+        <b>Story 3:</b> Closing image or simple message
+      </p>
+    </div>
+
+  </div>
+
+
+  <div class="section">
+
+    <h2>Highlights</h2>
+
+    <div class="card">
+      <p>
+        Life • Style • Travel • Work • Moments
+      </p>
+    </div>
+
+  </div>
+
+
+  <div class="section">
+
+    <h2>Approval</h2>
+
+    <div class="card">
+      <p>
+        GM prepares recommendations. You keep the final approval before
+        anything is published.
+      </p>
+    </div>
+
+  </div>
+
+</section>
+
+</main>
+
+
+<nav class="nav">
+
+  <button class="active" data-page="home">
+    <span>⌂</span>
+    Home
+  </button>
+
+  <button data-page="content">
+    <span>▣</span>
+    Content
+  </button>
+
+  <button data-page="planner">
+    <span>□</span>
+    Planner
+  </button>
+
+  <button data-page="profile">
+    <span>♙</span>
+    Profile
+  </button>
+
+</nav>
+
+</div>
+
+
+<script>
+
+const pages = document.querySelectorAll(".page");
+const navButtons = document.querySelectorAll(".nav button");
+
+
+function openPage(pageId) {
+
+  pages.forEach(page => {
+    page.classList.remove("active");
+  });
+
+  navButtons.forEach(button => {
+    button.classList.remove("active");
+  });
+
+  document.getElementById(pageId).classList.add("active");
+
+  const button = document.querySelector(
+    '.nav button[data-page="' + pageId + '"]'
+  );
+
+  if (button) {
+    button.classList.add("active");
+  }
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
+
+navButtons.forEach(button => {
+
+  button.addEventListener("click", function() {
+
+    openPage(this.dataset.page);
+
+  });
+
+});
+
+
+let selectedPhotos = [];
+
+
+document.getElementById("photos").addEventListener(
+  "change",
+  function(event) {
+
+    selectedPhotos =
+      Array.from(event.target.files).slice(0, 3);
+
+    const preview =
+      document.getElementById("preview");
+
+    preview.innerHTML = "";
+
+    selectedPhotos.forEach(file => {
+
+      const image =
+        document.createElement("img");
+
+      image.className = "photo";
+
+      image.src =
+        URL.createObjectURL(file);
+
+      preview.appendChild(image);
+
+    });
+
+    if (event.target.files.length > 3) {
+
+      alert(
+        "GM uses the first 3 selected photos."
+      );
+
+    }
+
+  }
+);
+
+
+function clearPhotos() {
+
+  selectedPhotos = [];
+
+  document.getElementById("photos").value = "";
+
+  document.getElementById("preview").innerHTML = "";
+
+  document.getElementById("recommendation").style.display =
+    "none";
+}
+
+
+function recommend() {
+
+  const result =
+    document.getElementById("recommendation");
+
+  result.style.display = "block";
+
+  if (selectedPhotos.length === 0) {
+
+    result.innerHTML =
+      "<b>Please choose at least one photo first.</b>";
+
+    return;
+  }
+
+  const mood =
+    document.getElementById("mood").value;
+
+  const topic =
+    document.getElementById("topic").value.trim()
+    || "your content";
+
+  result.innerHTML =
+
+    "<b>GM Post Recommendation</b><br><br>" +
+
+    "<b>🏆 Best photo:</b> " +
+
+    "Start with Photo 1 as the first candidate. " +
+    "Choose the frame with the strongest natural expression, " +
+    "lighting and composition.<br><br>" +
+
+    "<b>🧍 Natural pose:</b> " +
+
+    "Relax your shoulders, keep a comfortable posture, " +
+    "slightly angle the body and keep your hands natural.<br><br>" +
+
+    "<b>🎨 Aesthetic:</b> " +
+
+    mood + ". Keep colours realistic and editing subtle.<br><br>" +
+
+    "<span class='tag'>Natural</span>" +
+    "<span class='tag'>Premium</span>" +
+    "<span class='tag'>Clean</span>" +
+    "<span class='tag'>Professional</span><br><br>" +
+
+    "<b>🎵 Music:</b> " +
+
+    "Choose a current Instagram track that matches the mood " +
+    "of the final photo.<br><br>" +
+
+    "<b>✍️ Caption direction:</b> " +
+
+    "Keep the caption short, natural and confident about " +
+    topic + ".<br><br>" +
+
+    "<b>⏰ Posting time:</b> " +
+
+    "Use your Instagram audience Insights to select the strongest " +
+    "active period rather than inventing audience data.<br><br>" +
+
+    "<b>✓ Natural appearance rule:</b> " +
+
+    "Do not change facial identity, face structure or body proportions.";
+
+}
+
+
+function createCaption() {
+
+  const topic =
+    document.getElementById("captionTopic")
+    .value.trim() || "this moment";
+
+  const result =
+    document.getElementById("captionResult");
+
+  result.style.display = "block";
+
+  result.innerHTML =
+
+    "<b>Caption options</b><br><br>" +
+
+    "1. Keeping it simple. ✨<br><br>" +
+
+    "2. Just enjoying " +
+    escapeHtml(topic) +
+    ".<br><br>" +
+
+    "3. Simple moments. Good energy.";
+
+}
+
+
+function escapeHtml(text) {
+
+  return text.replace(
+    /[&<>"']/g,
+    function(character) {
+
+      const entities = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      };
+
+      return entities[character];
+
+    }
+  );
+
+}
+
+
+let plans =
+  JSON.parse(
+    localStorage.getItem("gmPlans") || "[]"
+  );
+
+
+function renderPlans() {
+
+  const container =
+    document.getElementById("plans");
+
+  if (plans.length === 0) {
+
+    container.innerHTML =
+      '<div class="empty">No planned content yet.</div>';
+
+    return;
+  }
+
+  container.innerHTML =
+    plans.map(function(plan, index) {
+
+      return `
+        <div class="item">
+          <div>
+            <b>${escapeHtml(plan.title)}</b>
+            <small>
+              ${escapeHtml(plan.date || "No date")}
+              ${plan.note ? " · " + escapeHtml(plan.note) : ""}
+            </small>
+          </div>
+
+          <button
+            class="btn secondary"
+            onclick="removePlan(${index})"
+          >
+            Remove
+          </button>
+        </div>
+      `;
+
+    }).join("");
+
+}
+
+
+function addPlan() {
+
+  const title =
+    document.getElementById("planTitle")
+    .value.trim();
+
+  const date =
+    document.getElementById("planDate")
+    .value;
+
+  const note =
+    document.getElementById("planNote")
+    .value.trim();
+
+  if (!title) {
+
+    alert("Please enter the content name.");
+
+    return;
+  }
+
+  plans.push({
+    title: title,
+    date: date,
+    note: note
+  });
+
+  localStorage.setItem(
+    "gmPlans",
+    JSON.stringify(plans)
+  );
+
+  document.getElementById("planTitle").value = "";
+  document.getElementById("planDate").value = "";
+  document.getElementById("planNote").value = "";
+
+  renderPlans();
+
+}
+
+
+function removePlan(index) {
+
+  plans.splice(index, 1);
+
+  localStorage.setItem(
+    "gmPlans",
+    JSON.stringify(plans)
+  );
+
+  renderPlans();
+
+}
+
+
+function saveProfile() {
+
+  const profile = {
+
+    name:
+      document.getElementById("profileName").value,
+
+    style:
+      document.getElementById("profileStyle").value,
+
+    tone:
+      document.getElementById("profileTone").value,
+
+    clothes:
+      document.getElementById("profileClothes").value
+
+  };
+
+  localStorage.setItem(
+    "gmProfile",
+    JSON.stringify(profile)
+  );
+
+  document.getElementById("profileSaved").textContent =
+    "Profile saved on this device.";
+
+}
+
+
+function loadProfile() {
+
+  const profile =
+    JSON.parse(
+      localStorage.getItem("gmProfile") || "null"
+    );
+
+  if (!profile) {
+    return;
+  }
+
+  document.getElementById("profileName").value =
+    profile.name || "";
+
+  document.getElementById("profileStyle").value =
+    profile.style ||
+    "Natural · Premium · Simple · Clean · Professional";
+
+  document.getElementById("profileTone").value =
+    profile.tone || "";
+
+  document.getElementById("profileClothes").value =
+    profile.clothes || "";
+
+}
+
+
+renderPlans();
+loadProfile();
+
+</script>
+
+</body>
+</html>
