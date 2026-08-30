@@ -1,903 +1,195 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07100b">
 <title>GM Manager</title>
 <style>
-:root{
---bg:#07100b;--card:#0d1913;--card2:#122219;--line:#23382b;
---text:#f4f7f5;--muted:#9eafa5;--green:#27d17d;--green2:#15995a;
---danger:#b94b4b;--gold:#e8c86a
-}
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
-font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-button,input,textarea,select{font:inherit}
-button{cursor:pointer}
-body{min-height:100vh}
-.app{max-width:960px;margin:auto;padding-bottom:92px}
-.top{
-position:sticky;top:0;z-index:50;padding:15px 16px;
-display:flex;align-items:center;gap:12px;background:rgba(7,16,11,.94);
-backdrop-filter:blur(18px);border-bottom:1px solid var(--line)
-}
-.logo{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;
-font-size:25px;font-weight:900;background:linear-gradient(145deg,#27d17d,#08723e)}
-.top h1{margin:0;font-size:21px}.top p{margin:2px 0 0;color:var(--muted);font-size:12px}
-main{padding:18px 15px}
-.page{display:none}.page.active{display:block}
-.hero{
-padding:26px 21px;border-radius:27px;margin-bottom:15px;
-background:radial-gradient(circle at top right,#175535,#10281b 45%,#0b1710);
-border:1px solid #286544
-}
-.eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.14em;
-font-weight:900;color:#6eeca8}
-.hero h2{font-size:32px;line-height:1.1;margin:9px 0 12px}
-.hero p{color:#bdcbc3;line-height:1.55;font-size:14px}
-.btn{
-border:0;border-radius:13px;padding:12px 15px;background:var(--green);
-color:#041008;font-weight:850
-}
-.btn.secondary{background:#16271e;color:var(--text);border:1px solid var(--line)}
-.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
-.btn.danger{background:#35191b;color:#ffb4b4}
-.btn.small{padding:8px 11px;font-size:12px}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px}
-.card h3{margin:0 0 7px;font-size:17px}.card p{margin:0;color:var(--muted);line-height:1.5;font-size:13px}
-.icon{font-size:24px;margin-bottom:8px}
-.section{display:flex;justify-content:space-between;align-items:center;margin:24px 2px 11px}
-.section h2{font-size:19px;margin:0}.section span{font-size:11px;color:var(--muted)}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
-.stat strong{font-size:23px}.stat small{display:block;color:var(--muted);margin-top:3px}
-.notice{padding:12px 13px;border:1px solid var(--line);background:#0b1710;
-border-radius:14px;color:#afbeb5;font-size:11px;line-height:1.5;margin-top:12px}
-.nav{
-position:fixed;z-index:60;bottom:0;left:50%;transform:translateX(-50%);
-width:min(960px,100%);height:76px;padding-bottom:env(safe-area-inset-bottom);
-display:grid;grid-template-columns:repeat(4,1fr);background:rgba(8,18,12,.97);
-border-top:1px solid var(--line);backdrop-filter:blur(18px)
-}
-.nav button{border:0;background:transparent;color:#82938a;font-size:10px;font-weight:800;
-display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
-.nav button.active{color:#48df8e}.nav i{font-style:normal;font-size:21px}
-.picker{border:1px dashed #3b654c;border-radius:20px;padding:24px 15px;text-align:center;background:#0a160f}
-.picker input{display:none}
-.photos{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px}
-.photo{aspect-ratio:1;border-radius:15px;overflow:hidden;border:2px solid transparent;position:relative;background:#17231c}
-.photo.active{border-color:var(--green)}
-.photo img{width:100%;height:100%;object-fit:cover}
-.photo .tag{position:absolute;top:7px;left:7px;padding:4px 7px;border-radius:20px;
-background:#000b;color:white;font-size:10px;font-weight:800}
-.photo .remove{position:absolute;right:6px;top:6px;width:24px;height:24px;border:0;
-border-radius:50%;background:#000b;color:#fff}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.result{display:none}.result.show{display:block}
-.best{display:grid;grid-template-columns:125px 1fr;gap:14px;align-items:center}
-.best img{width:125px;height:125px;border-radius:18px;object-fit:cover}
-.score{font-size:27px;font-weight:950;color:#66e79f}
-.muted{color:var(--muted)}
-.rows{margin-top:12px}.row{display:flex;justify-content:space-between;gap:15px;
-padding:11px 0;border-bottom:1px solid var(--line);font-size:13px}
-.row:last-child{border-bottom:0}.row span:last-child{text-align:right;color:#aebcb4}
-.pills span{display:inline-block;padding:6px 9px;background:#143a27;color:#73e8a4;
-border-radius:20px;font-size:10px;font-weight:850;margin:3px}
+:root{--bg:#07100b;--card:#0d1913;--card2:#122219;--line:#23382b;--text:#f4f7f5;--muted:#9eafa5;--green:#27d17d;--green2:#15995a;--danger:#b94b4b}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+button,input,textarea,select{font:inherit}button{cursor:pointer}.app{max-width:960px;margin:auto;padding-bottom:88px}
+.top{position:sticky;top:0;z-index:20;padding:14px 16px;display:flex;gap:12px;align-items:center;background:#07100bf2;border-bottom:1px solid var(--line);backdrop-filter:blur(16px)}
+.logo{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;font-size:25px;font-weight:900;background:linear-gradient(145deg,#27d17d,#08723e)}
+h1,h2,h3,p{margin-top:0}.top h1{font-size:21px;margin-bottom:2px}.top p{font-size:12px;color:var(--muted);margin:0}
+main{padding:18px 15px}.page{display:none}.page.active{display:block}
+.hero{padding:25px 20px;border-radius:26px;background:radial-gradient(circle at top right,#175535,#10281b 45%,#0b1710);border:1px solid #286544;margin-bottom:15px}
+.hero h2{font-size:32px;line-height:1.08;margin:8px 0 12px}.hero p,.card p{color:var(--muted);line-height:1.5;font-size:13px}
+.eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:#6eeca8;font-weight:900}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:10px}
+.card h3{font-size:17px;margin-bottom:7px}.icon{font-size:24px;margin-bottom:7px}
+.btn{border:0;border-radius:13px;padding:12px 15px;background:var(--green);color:#041008;font-weight:850}
+.btn.secondary{background:#16271e;color:var(--text);border:1px solid var(--line)}.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.danger{background:#35191b;color:#ffb4b4}.btn.small{padding:8px 11px;font-size:12px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}.section{display:flex;justify-content:space-between;align-items:center;margin:23px 2px 10px}.section h2{font-size:19px;margin:0}.section span{font-size:11px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px}.stat strong{font-size:22px}.stat small{display:block;color:var(--muted)}
+.nav{position:fixed;z-index:30;bottom:0;left:50%;transform:translateX(-50%);width:min(960px,100%);height:76px;padding-bottom:env(safe-area-inset-bottom);display:grid;grid-template-columns:repeat(4,1fr);background:#08120cf7;border-top:1px solid var(--line);backdrop-filter:blur(16px)}
+.nav button{border:0;background:none;color:#82938a;font-size:10px;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}.nav button.active{color:#48df8e}.nav i{font-size:21px;font-style:normal}
+.picker{border:1px dashed #3b654c;border-radius:20px;padding:23px 15px;text-align:center;background:#0a160f}.picker input{display:none}
+.photos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:11px}.photo{aspect-ratio:1;border:2px solid transparent;border-radius:15px;overflow:hidden;position:relative}.photo.active{border-color:var(--green)}.photo img{width:100%;height:100%;object-fit:cover}.tag{position:absolute;top:6px;left:6px;background:#000b;padding:4px 7px;border-radius:20px;font-size:10px}.remove{position:absolute;top:5px;right:5px;width:24px;height:24px;border:0;border-radius:50%;background:#000b;color:white}
+.notice,.status{padding:11px 12px;background:#0b1710;border:1px solid var(--line);border-radius:13px;color:#aebdb5;font-size:11px;line-height:1.5;margin-top:10px}
+.best{display:grid;grid-template-columns:125px 1fr;gap:13px;align-items:center}.best img{width:125px;height:125px;object-fit:cover;border-radius:18px}.score{font-size:27px;font-weight:950;color:#66e79f}
+.rows{margin-top:10px}.row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:12px}.row:last-child{border:0}.row span:last-child{text-align:right;color:#b5c3bb}
+.pills span{display:inline-block;padding:5px 8px;background:#143a27;color:#73e8a4;border-radius:20px;font-size:10px;font-weight:850;margin:2px}
 label.field{display:block;font-size:11px;color:#aebdb5;font-weight:800;margin:10px 0 6px}
-input[type=text],input[type=date],input[type=time],input[type=url],textarea,select{
-width:100%;background:#09130d;color:var(--text);border:1px solid var(--line);
-border-radius:12px;padding:11px;outline:none
-}
-textarea{resize:vertical}
-input:focus,textarea:focus,select:focus{border-color:#39d982}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.event{padding:13px;background:#0d1c14;border-left:3px solid var(--green);
-border-radius:12px;margin-bottom:9px}
-.event strong{display:block}.event small{color:var(--muted)}
-.empty{text-align:center;padding:25px;border:1px dashed #294033;border-radius:17px;color:var(--muted)}
-.modal{display:none;position:fixed;inset:0;z-index:100;background:#000b;
-align-items:flex-end;justify-content:center;padding:12px}
-.modal.show{display:flex}
-.sheet{width:min(720px,100%);max-height:91vh;overflow:auto;background:#0d1913;
-border:1px solid var(--line);border-radius:24px;padding:18px}
-.sheethead{display:flex;justify-content:space-between;align-items:center}
-.close{width:38px;height:38px;border:0;border-radius:50%;background:#17271f;color:white;font-size:20px}
-canvas{max-width:100%;display:block}
-.editor-preview{width:100%;border-radius:18px;background:#050a07;margin-top:12px}
-.slider{width:100%}
-.toast{position:fixed;z-index:200;bottom:91px;left:50%;transform:translate(-50%,20px);
-opacity:0;pointer-events:none;background:#edf8f1;color:#061009;padding:12px 15px;
-border-radius:13px;font-size:12px;font-weight:850;transition:.2s;max-width:90%;text-align:center}
-.toast.show{opacity:1;transform:translate(-50%,0)}
-.status{padding:10px 12px;border-radius:12px;background:#111f17;border:1px solid var(--line);
-font-size:11px;color:#b8c7be;margin-top:10px}
-@media(min-width:700px){
-main{padding:25px}.grid{grid-template-columns:repeat(3,1fr)}
-.hero{padding:38px}.hero h2{font-size:43px}
-.modal{align-items:center}.sheet{max-height:85vh}
-}
-@media(max-width:430px){
-.hero h2{font-size:29px}.best{grid-template-columns:100px 1fr}.best img{width:100px;height:100px}
-}
+input[type=text],input[type=date],input[type=time],textarea,select{width:100%;background:#09130d;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:11px;outline:0}
+textarea{resize:vertical}.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.empty{text-align:center;padding:25px;border:1px dashed #294033;border-radius:17px;color:var(--muted)}
+.event{padding:13px;background:#0d1c14;border-left:3px solid var(--green);border-radius:12px;margin-bottom:9px}.event small{color:var(--muted)}
+.modal{display:none;position:fixed;z-index:100;inset:0;background:#000b;align-items:flex-end;justify-content:center;padding:12px}.modal.show{display:flex}.sheet{width:min(720px,100%);max-height:91vh;overflow:auto;background:#0d1913;border:1px solid var(--line);border-radius:24px;padding:18px}.sheethead{display:flex;justify-content:space-between;align-items:center}.close{width:38px;height:38px;border:0;border-radius:50%;background:#17271f;color:#fff;font-size:20px}
+canvas{max-width:100%;display:block}.preview{width:100%;border-radius:18px;background:#050a07;margin-top:11px}.toast{position:fixed;z-index:200;bottom:91px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#edf8f1;color:#061009;padding:12px 15px;border-radius:13px;font-size:12px;font-weight:850;transition:.2s;max-width:90%;text-align:center}.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(min-width:700px){main{padding:25px}.grid{grid-template-columns:repeat(3,1fr)}.hero{padding:38px}.hero h2{font-size:43px}.modal{align-items:center}.sheet{max-height:85vh}}
 </style>
 </head>
 <body>
-
 <div class="app">
-<header class="top">
-<div class="logo">✦</div>
-<div><h1>GM Manager</h1><p>Your personal Instagram & social-media manager</p></div>
-</header>
+<header class="top"><div class="logo">✦</div><div><h1>GM Manager</h1><p>Your personal Instagram & social-media manager</p></div></header>
 
 <main>
-
-<!-- HOME -->
 <section id="home" class="page active">
-<div class="hero">
-<div class="eyebrow">GM • Personal Manager</div>
-<h2>Make every post feel like you.</h2>
-<p>Choose, edit, plan and approve your content while keeping your appearance natural, premium and authentic.</p>
-<div class="actions">
-<button class="btn" onclick="go('content')">🤖 Start Post Studio</button>
-<button class="btn secondary" onclick="go('planner')">📅 Planner</button>
-</div>
-</div>
-
-<div class="stats">
-<div class="stat"><strong id="sPending">0</strong><small>Pending</small></div>
-<div class="stat"><strong id="sPlanned">0</strong><small>Planned</small></div>
-<div class="stat"><strong id="sApproved">0</strong><small>Approved</small></div>
-</div>
-
-<div class="section"><h2>GM Features</h2><span>Final foundation</span></div>
+<div class="hero"><div class="eyebrow">GM • Personal Manager</div><h2>Make every post feel like you.</h2><p>Choose, edit, plan and approve your content while keeping your appearance natural, premium and authentic.</p><div class="actions"><button class="btn" onclick="go('content')">🤖 Open Post Studio</button><button class="btn secondary" onclick="go('planner')">📅 Planner</button></div></div>
+<div class="stats"><div class="stat"><strong id="pending">0</strong><small>Pending</small></div><div class="stat"><strong id="planned">0</strong><small>Planned</small></div><div class="stat"><strong id="approved">0</strong><small>Approved</small></div></div>
+<div class="section"><h2>GM Features</h2><span>Final build</span></div>
 <div class="grid">
-<div class="card"><div class="icon">📸</div><h3>Photo Studio</h3><p>Upload photos, compare them and make real browser-side edits.</p><button class="btn secondary small" onclick="go('content')">Open</button></div>
-<div class="card"><div class="icon">🤖</div><h3>AI Post Suggestions</h3><p>Best-photo scoring, caption, aesthetic, music and posting plan.</p><button class="btn secondary small" onclick="go('content')">Open</button></div>
-<div class="card"><div class="icon">📅</div><h3>Planner</h3><p>Posts, Stories, Reels and ideas.</p><button class="btn secondary small" onclick="go('planner')">Open</button></div>
-<div class="card"><div class="icon">📱</div><h3>Stories & Collage</h3><p>Create Story plans and actual image collages.</p><button class="btn secondary small" onclick="openModal('storyModal')">Open</button></div>
-<div class="card"><div class="icon">⭐</div><h3>Highlights</h3><p>Organize categories, names and cover ideas.</p><button class="btn secondary small" onclick="openModal('highlightModal')">Open</button></div>
-<div class="card"><div class="icon">📊</div><h3>Analytics</h3><p>Local foundation ready for real Meta data later.</p><button class="btn secondary small" onclick="openModal('analyticsModal')">Open</button></div>
+<div class="card"><div class="icon">📸</div><h3>Photo Studio</h3><p>Upload, compare and naturally edit your photos.</p><button class="btn secondary small" onclick="go('content')">Open</button></div>
+<div class="card"><div class="icon">🤖</div><h3>AI Post Suggestions</h3><p>AI analysis, caption, aesthetic, music and timing.</p><button class="btn secondary small" onclick="go('content')">Open</button></div>
+<div class="card"><div class="icon">📅</div><h3>Planner</h3><p>Posts, Stories, Reels and content ideas.</p><button class="btn secondary small" onclick="go('planner')">Open</button></div>
+<div class="card"><div class="icon">📱</div><h3>Stories & Collage</h3><p>Plan Stories and create a real local collage.</p><button class="btn secondary small" onclick="openM('story')">Open</button></div>
+<div class="card"><div class="icon">⭐</div><h3>Highlights</h3><p>Categories, names and clean organization.</p><button class="btn secondary small" onclick="openM('high')">Open</button></div>
+<div class="card"><div class="icon">📊</div><h3>Analytics</h3><p>Local foundation ready for Meta data.</p><button class="btn secondary small" onclick="openM('analytics')">Open</button></div>
 </div>
-
-<div class="section"><h2>GM Rules</h2></div>
-<div class="card">
-<div class="rows">
-<div class="row"><b>Identity</b><span>Preserve</span></div>
-<div class="row"><b>Face structure</b><span>Preserve</span></div>
-<div class="row"><b>Body proportions</b><span>Preserve</span></div>
-<div class="row"><b>Natural appearance</b><span>Priority</span></div>
-<div class="row"><b>Background</b><span>Minimal changes</span></div>
-<div class="row"><b>Automatic posting</b><span>Never</span></div>
-</div>
-</div>
+<div class="section"><h2>GM rules</h2></div>
+<div class="card"><div class="rows"><div class="row"><b>Face identity</b><span>Preserve</span></div><div class="row"><b>Face structure</b><span>Preserve</span></div><div class="row"><b>Body proportions</b><span>Preserve</span></div><div class="row"><b>Natural appearance</b><span>Priority</span></div><div class="row"><b>Automatic posting</b><span>Never</span></div></div></div>
 </section>
 
-<!-- CONTENT -->
 <section id="content" class="page">
-<div class="section"><h2>Photo Studio</h2><span>2–3 photos recommended</span></div>
-
+<div class="section"><h2>Photo Studio</h2><span>Up to 3 photos</span></div>
 <div class="card">
-<div class="picker">
-<div style="font-size:32px">📷</div>
-<h3>Select photos</h3>
-<p>Choose up to 3 photos from your phone.</p>
-<label class="btn" for="photoInput">Choose Photos</label>
-<input id="photoInput" type="file" accept="image/*" multiple>
-</div>
-<div id="photoGrid" class="photos"></div>
-
-<div class="actions">
-<button class="btn" onclick="recommend()">✨ GM Recommendation</button>
-<button class="btn secondary" onclick="clearPhotos()">Clear</button>
+<div class="picker"><div style="font-size:31px">📷</div><h3>Select photos</h3><p>Choose 1–3 photos from your phone.</p><label class="btn" for="files">Choose Photos</label><input id="files" type="file" accept="image/*" multiple></div>
+<div id="photos" class="photos"></div><div class="actions"><button class="btn" onclick="analyze()">✨ GM AI Analysis</button><button class="btn secondary" onclick="clearPhotos()">Clear</button></div>
+<div class="notice">GM sends the selected image data only when you tap an AI action. Local editing works without an AI service.</div>
 </div>
 
-<div class="notice">
-GM compares the selected files using real browser-readable information such as resolution,
-orientation and image properties. It does not pretend that this local HTML has a hidden vision model.
-</div>
+<div class="section"><h2>Natural Photo Editor</h2><span>Works now</span></div>
+<div class="card"><canvas id="canvas" class="preview"></canvas>
+<label class="field">Brightness</label><input id="bright" type="range" min="50" max="150" value="100" oninput="render()">
+<label class="field">Contrast</label><input id="contrast" type="range" min="50" max="150" value="100" oninput="render()">
+<div class="actions"><button class="btn secondary" onclick="rotate()">↻ Rotate</button><button class="btn secondary" onclick="flip()">↔ Flip</button><button class="btn secondary" onclick="resetEdit()">Reset</button><button class="btn" onclick="saveEdited()">Save Edited Photo</button></div>
 </div>
 
-<div class="section"><h2>Natural Photo Editor</h2><span>Real browser editing</span></div>
+<div class="section"><h2>AI Pose Studio</h2><span>One tap</span></div>
 <div class="card">
-<p>These controls actually modify the selected image locally.</p>
-<canvas id="editorCanvas" class="editor-preview"></canvas>
-
-<label class="field">Brightness</label>
-<input id="brightness" class="slider" type="range" min="50" max="150" value="100" oninput="renderEditor()">
-<label class="field">Contrast</label>
-<input id="contrast" class="slider" type="range" min="50" max="150" value="100" oninput="renderEditor()">
-
-<div class="actions">
-<button class="btn secondary" onclick="rotateEditor()">↻ Rotate</button>
-<button class="btn secondary" onclick="flipEditor()">↔ Flip</button>
-<button class="btn secondary" onclick="resetEditor()">Reset</button>
-<button class="btn" onclick="downloadEdited()">Save Edited Photo</button>
+<p>GM sends the selected photo to your secure server and asks the image model to change only the pose while preserving identity, face structure, body proportions, clothing and realistic appearance.</p>
+<label class="field">Pose instruction</label><textarea id="pose" rows="3">Change the person's pose to a natural, relaxed, realistic pose. Preserve the exact facial identity, face structure, body proportions, body size, clothing, hairstyle and overall appearance. Do not beautify, reshape, slim, enlarge or replace the person. Keep the original environment as much as possible and make the result look like a real camera photograph.</textarea>
+<div class="actions"><button class="btn" onclick="poseEdit()">🧍 Generate Natural Pose</button></div>
+<div id="poseStatus" class="status">Ready.</div>
+<img id="poseResult" style="display:none;width:100%;border-radius:18px;margin-top:11px" alt="GM generated pose">
+<a id="poseSave" class="btn secondary" style="display:none;text-decoration:none;margin-top:9px;text-align:center" download="gm-natural-pose.png">Save Generated Photo</a>
 </div>
 
-<div class="notice">
-Editing is intentionally subtle. It does not reshape your face or body.
-</div>
-</div>
-
-<div class="section"><h2>AI Pose Editing</h2><span>Real API connection</span></div>
-<div class="card">
-<p>
-A genuine generative pose change requires an image-editing AI service.
-This interface sends your selected photo to the endpoint you configure; it does not fake a generated result.
-</p>
-
-<label class="field">AI image-edit API endpoint</label>
-<input id="aiEndpoint" type="url" placeholder="https://your-backend.example/api/edit">
-
-<label class="field">Pose instruction</label>
-<textarea id="posePrompt" rows="3">Make the pose look more natural and relaxed. Preserve the exact facial identity, face structure, body proportions, clothing and realistic appearance. Do not change the person's identity or body shape.</textarea>
-
-<div class="actions">
-<button class="btn" onclick="runAIEdit()">🧍 Generate Natural Pose</button>
-<button class="btn secondary" onclick="saveEndpoint()">Save Endpoint</button>
-</div>
-<div id="aiStatus" class="status">No AI edit requested yet.</div>
-<img id="aiResult" style="display:none;width:100%;border-radius:18px;margin-top:12px" alt="AI edited result">
-<div class="actions">
-<a id="aiDownload" class="btn secondary" style="display:none;text-decoration:none" download="gm-natural-pose.png">Save AI Result</a>
-</div>
-
-<div class="notice">
-For security, production API keys should stay on a backend/server and should never be placed inside this HTML.
-</div>
-</div>
-
-<div id="recommendation" class="result">
-<div class="section"><h2>GM Recommendation</h2><span id="recClock"></span></div>
-<div class="card">
-<div class="best">
-<img id="bestImg" alt="Best photo">
-<div>
-<div id="score" class="score">0/100</div>
-<strong id="bestName">Best photo</strong>
-<p id="bestWhy" class="muted"></p>
-</div>
-</div>
-
-<div class="pills" style="margin-top:10px">
-<span>Natural</span><span>Premium</span><span>Clean</span>
-</div>
-
-<div class="rows">
-<div class="row"><b>🎨 Aesthetic</b><span id="recAesthetic"></span></div>
-<div class="row"><b>🧍 Pose</b><span id="recPose"></span></div>
-<div class="row"><b>📐 Composition</b><span id="recComposition"></span></div>
-<div class="row"><b>🪄 Editing</b><span id="recEditing"></span></div>
-<div class="row"><b>🎵 Music</b><span id="recMusic"></span></div>
-<div class="row"><b>🕐 Posting time</b><span id="recTime"></span></div>
-</div>
-
-<label class="field">Caption</label>
-<textarea id="recCaption" rows="3"></textarea>
-
-<div class="actions">
-<button class="btn" onclick="approve()">✓ Approve</button>
-<button class="btn secondary" onclick="go('planner')">📅 Add to Planner</button>
-<button class="btn ghost" onclick="document.getElementById('recommendation').classList.remove('show')">Not now</button>
-</div>
-</div>
+<div id="rec" style="display:none">
+<div class="section"><h2>GM Recommendation</h2><span>AI result</span></div>
+<div class="card"><div class="best"><img id="best" alt="Best photo"><div><div id="score" class="score">—</div><b id="bestTitle">Best photo</b><p id="why" class="muted"></p></div></div>
+<div class="pills"><span>Natural</span><span>Premium</span><span>Clean</span></div>
+<div class="rows"><div class="row"><b>🎨 Aesthetic</b><span id="aesthetic"></span></div><div class="row"><b>🧍 Pose</b><span id="poseTip"></span></div><div class="row"><b>📐 Composition</b><span id="composition"></span></div><div class="row"><b>🪄 Editing</b><span id="editing"></span></div><div class="row"><b>🎵 Music</b><span id="music"></span></div><div class="row"><b>🕐 Posting time</b><span id="time"></span></div></div>
+<label class="field">Caption</label><textarea id="caption" rows="3"></textarea>
+<div class="actions"><button class="btn" onclick="approve()">✓ Approve</button><button class="btn secondary" onclick="openM('planner')">📅 Add to Planner</button></div></div>
 </div>
 </section>
 
-<!-- PLANNER -->
 <section id="planner" class="page">
-<div class="section"><h2>Content Planner</h2><button class="btn small" onclick="openModal('plannerModal')">＋ Add</button></div>
-<div id="events"></div>
-<div class="section"><h2>Content strategy</h2></div>
-<div class="card">
-<div class="rows">
-<div class="row"><b>Post</b><span>Best photo + caption</span></div>
-<div class="row"><b>Story</b><span>3-frame sequence</span></div>
-<div class="row"><b>Reel</b><span>Idea + music + hook</span></div>
-<div class="row"><b>Review</b><span>Approve before publishing</span></div>
-</div>
-</div>
+<div class="section"><h2>Content Planner</h2><button class="btn small" onclick="openM('planner')">＋ Add</button></div><div id="events"></div>
+<div class="section"><h2>Strategy</h2></div><div class="card"><div class="rows"><div class="row"><b>Post</b><span>Best photo + caption</span></div><div class="row"><b>Story</b><span>3-frame sequence</span></div><div class="row"><b>Reel</b><span>Hook + music + idea</span></div><div class="row"><b>Approval</b><span>Always required</span></div></div></div>
 </section>
 
-<!-- PROFILE -->
 <section id="profile" class="page">
-<div class="section"><h2>GM Personal Profile</h2><span>Saved locally</span></div>
-<div class="card">
-<label class="field">Personal style</label>
-<select id="profileStyle">
-<option>Natural • Premium • Simple • Clean</option>
-<option>Natural • Minimal • Casual</option>
-<option>Professional • Premium • Clean</option>
-<option>Simple • Elegant • Natural</option>
-</select>
-
-<label class="field">Communication / caption style</label>
-<textarea id="profileCommunication" rows="3" placeholder="Example: short, natural, confident, not overdone."></textarea>
-
-<label class="field">Clothing preferences</label>
-<textarea id="profileClothing" rows="3" placeholder="Preferred outfits, colors, combinations..."></textarea>
-
-<label class="field">Photo preferences</label>
-<textarea id="profilePhoto" rows="3" placeholder="Locations, lighting, moods, composition..."></textarea>
-
-<label class="field">Preferred music mood</label>
-<input id="profileMusic" type="text" placeholder="Calm, confident, romantic, energetic...">
-
-<div class="actions"><button class="btn" onclick="saveProfile()">Save GM Profile</button></div>
-</div>
-
-<div class="section"><h2>Identity protection</h2></div>
-<div class="card">
-<div class="rows">
-<div class="row"><b>Face identity</b><span>Always preserve</span></div>
-<div class="row"><b>Face structure</b><span>Always preserve</span></div>
-<div class="row"><b>Body proportions</b><span>Always preserve</span></div>
-<div class="row"><b>Natural appearance</b><span>Priority</span></div>
-</div>
-</div>
+<div class="section"><h2>GM Personal Profile</h2><span>Saved on device</span></div>
+<div class="card"><label class="field">Personal style</label><select id="style"><option>Natural • Premium • Simple • Clean</option><option>Natural • Minimal • Casual</option><option>Professional • Premium • Clean</option><option>Simple • Elegant • Natural</option></select>
+<label class="field">Communication / caption style</label><textarea id="communication" rows="3" placeholder="Short, natural, confident, not overdone..."></textarea>
+<label class="field">Clothing preferences</label><textarea id="clothing" rows="3"></textarea>
+<label class="field">Photo preferences</label><textarea id="photoPref" rows="3"></textarea>
+<label class="field">Music mood</label><input id="musicPref" type="text" placeholder="Calm, confident, romantic, energetic...">
+<div class="actions"><button class="btn" onclick="saveProfile()">Save GM Profile</button></div></div>
+<div class="card"><h3>Identity protection</h3><p>GM is instructed to preserve facial identity, face structure and body proportions. Automatic Instagram posting is disabled.</p></div>
 </section>
-
 </main>
 
-<nav class="nav">
-<button class="active" data-page="home" onclick="go('home')"><i>⌂</i>Home</button>
-<button data-page="content" onclick="go('content')"><i>▣</i>Content</button>
-<button data-page="planner" onclick="go('planner')"><i>□</i>Planner</button>
-<button data-page="profile" onclick="go('profile')"><i>♙</i>Profile</button>
-</nav>
+<nav class="nav"><button class="active" data-page="home" onclick="go('home')"><i>⌂</i>Home</button><button data-page="content" onclick="go('content')"><i>▣</i>Content</button><button data-page="planner" onclick="go('planner')"><i>□</i>Planner</button><button data-page="profile" onclick="go('profile')"><i>♙</i>Profile</button></nav>
 </div>
 
-<!-- PLANNER MODAL -->
-<div id="plannerModal" class="modal" onclick="backdrop(event,'plannerModal')">
-<div class="sheet">
-<div class="sheethead"><h2>Add Content</h2><button class="close" onclick="closeModal('plannerModal')">×</button></div>
+<div id="plannerM" class="modal" onclick="back(event,'plannerM')"><div class="sheet"><div class="sheethead"><h2>Add Content</h2><button class="close" onclick="closeM('plannerM')">×</button></div>
+<label class="field">Type</label><select id="etype"><option>Post</option><option>Story</option><option>Reel</option><option>Content Idea</option></select>
+<div class="two"><div><label class="field">Date</label><input id="edate" type="date"></div><div><label class="field">Time</label><input id="etime" type="time"></div></div>
+<label class="field">Title</label><input id="etitle" type="text" placeholder="Weekend photo post"><label class="field">Notes</label><textarea id="enotes" rows="3"></textarea>
+<div class="actions"><button class="btn" onclick="addEvent()">Save</button></div></div></div>
 
-<label class="field">Type</label>
-<select id="eventType"><option>Post</option><option>Story</option><option>Reel</option><option>Content Idea</option></select>
+<div id="storyM" class="modal" onclick="back(event,'storyM')"><div class="sheet"><div class="sheethead"><h2>Stories & Collage</h2><button class="close" onclick="closeM('storyM')">×</button></div>
+<div class="card"><h3>📱 Story plan</h3><div class="rows"><div class="row"><b>Story 1</b><span>Strong opening photo</span></div><div class="row"><b>Story 2</b><span>Detail / BTS</span></div><div class="row"><b>Story 3</b><span>Text + mood music</span></div></div></div>
+<div class="card"><h3>🖼️ Collage</h3><p>Select 2–3 photos in Content, then create the collage.</p><button class="btn" onclick="collage()">Create Collage</button><canvas id="collage" style="display:none;width:100%;margin-top:10px;border-radius:16px"></canvas><a id="collageSave" class="btn secondary" style="display:none;text-decoration:none;margin-top:8px;text-align:center" download="gm-collage.png">Save Collage</a></div>
+</div></div>
 
-<div class="two">
-<div><label class="field">Date</label><input id="eventDate" type="date"></div>
-<div><label class="field">Time</label><input id="eventTime" type="time"></div>
-</div>
+<div id="highM" class="modal" onclick="back(event,'highM')"><div class="sheet"><div class="sheethead"><h2>Highlights Manager</h2><button class="close" onclick="closeM('highM')">×</button></div><div class="grid"><div class="card"><h3>✨ Life</h3><p>Everyday moments.</p></div><div class="card"><h3>📸 Photos</h3><p>Best looks.</p></div><div class="card"><h3>✈️ Travel</h3><p>Trips and places.</p></div><div class="card"><h3>🎯 Work</h3><p>Projects.</p></div><div class="card"><h3>❤️ Moments</h3><p>Memories.</p></div><div class="card"><h3>🎵 Music</h3><p>Moods.</p></div></div></div></div>
 
-<label class="field">Title</label>
-<input id="eventTitle" type="text" placeholder="Weekend photo post">
-
-<label class="field">Notes</label>
-<textarea id="eventNotes" rows="3" placeholder="Caption, music, idea..."></textarea>
-
-<div class="actions">
-<button class="btn" onclick="addEvent()">Save</button>
-<button class="btn secondary" onclick="closeModal('plannerModal')">Cancel</button>
-</div>
-</div>
-</div>
-
-<!-- STORY MODAL -->
-<div id="storyModal" class="modal" onclick="backdrop(event,'storyModal')">
-<div class="sheet">
-<div class="sheethead"><h2>Stories & Collage</h2><button class="close" onclick="closeModal('storyModal')">×</button></div>
-
-<div class="card">
-<h3>📱 Story sequence</h3>
-<div class="rows">
-<div class="row"><b>Story 1</b><span>Strong opening photo</span></div>
-<div class="row"><b>Story 2</b><span>Detail / behind the scenes</span></div>
-<div class="row"><b>Story 3</b><span>Short text + mood music</span></div>
-</div>
-</div>
-
-<div class="card" style="margin-top:10px">
-<h3>🖼️ Collage</h3>
-<p>Select 2–3 photos in Content, then create the collage.</p>
-<button class="btn" onclick="makeCollage()">Create Collage</button>
-<canvas id="collage" style="display:none;width:100%;margin-top:12px;border-radius:16px"></canvas>
-<a id="collageSave" class="btn secondary" style="display:none;margin-top:10px;text-decoration:none;text-align:center" download="gm-collage.png">Save Collage</a>
-</div>
-</div>
-</div>
-
-<!-- HIGHLIGHTS -->
-<div id="highlightModal" class="modal" onclick="backdrop(event,'highlightModal')">
-<div class="sheet">
-<div class="sheethead"><h2>Highlights Manager</h2><button class="close" onclick="closeModal('highlightModal')">×</button></div>
-<div class="grid">
-<div class="card"><div class="icon">✨</div><h3>Life</h3><p>Everyday moments.</p></div>
-<div class="card"><div class="icon">📸</div><h3>Photos</h3><p>Best looks and shoots.</p></div>
-<div class="card"><div class="icon">✈️</div><h3>Travel</h3><p>Trips and places.</p></div>
-<div class="card"><div class="icon">🎯</div><h3>Work</h3><p>Projects and achievements.</p></div>
-<div class="card"><div class="icon">❤️</div><h3>Moments</h3><p>Personal memories.</p></div>
-<div class="card"><div class="icon">🎵</div><h3>Music</h3><p>Music and moods.</p></div>
-</div>
-<div class="notice">Keep Highlight names short and cover styles consistent for a clean premium profile.</div>
-</div>
-</div>
-
-<!-- ANALYTICS -->
-<div id="analyticsModal" class="modal" onclick="backdrop(event,'analyticsModal')">
-<div class="sheet">
-<div class="sheethead"><h2>Analytics</h2><button class="close" onclick="closeModal('analyticsModal')">×</button></div>
-<div class="stats">
-<div class="stat"><strong id="aApproved">0</strong><small>Approved</small></div>
-<div class="stat"><strong id="aPlanned">0</strong><small>Planned</small></div>
-<div class="stat"><strong id="aPhotos">0</strong><small>Photos used</small></div>
-</div>
-<div class="notice">
-Real Instagram reach, engagement, audience activity and best-time analytics require the official Meta/Instagram API.
-This version does not invent that data.
-</div>
-</div>
-</div>
+<div id="analyticsM" class="modal" onclick="back(event,'analyticsM')"><div class="sheet"><div class="sheethead"><h2>Analytics</h2><button class="close" onclick="closeM('analyticsM')">×</button></div><div class="stats"><div class="stat"><strong id="aa">0</strong><small>Approved</small></div><div class="stat"><strong id="ap">0</strong><small>Planned</small></div><div class="stat"><strong id="aph">0</strong><small>Photos</small></div></div><div class="notice">Real Instagram reach, engagement and audience timing require Meta/Instagram permissions. GM does not invent those numbers.</div></div></div>
 
 <div id="toast" class="toast"></div>
-
 <script>
-const state={
-photos:[],
-editorIndex:0,
-rotation:0,
-flip:false,
-approved:Number(localStorage.getItem("gmApproved")||0)
-};
+const S={photos:[],i:0,rot:0,flip:false,approved:+localStorage.getItem('gmApproved')||0};
+const $=x=>document.getElementById(x);
+function toast(t){let x=$('toast');x.textContent=t;x.classList.add('show');clearTimeout(window.tt);window.tt=setTimeout(()=>x.classList.remove('show'),2400)}
+function go(p){document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===p));document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===p));scrollTo(0,0);stats()}
+function openM(n){let id={planner:'plannerM',story:'storyM',high:'highM',analytics:'analyticsM'}[n]||n;$(''+id).classList.add('show')}
+function closeM(id){$(id).classList.remove('show')}
+function back(e,id){if(e.target.id===id)closeM(id)}
+$('files').onchange=async e=>{clearPhotos(false);for(const f of [...e.target.files].slice(0,3)){if(!f.type.startsWith('image/'))continue;let u=URL.createObjectURL(f),im=await img(u);S.photos.push({file:f,url:u,img:im})}drawPhotos();if(S.photos.length)select(0);if(e.target.files.length>3)toast('GM uses a maximum of 3 photos.')}
+function img(u){return new Promise((r,j)=>{let i=new Image();i.onload=()=>r(i);i.onerror=j;i.src=u})}
+function drawPhotos(){let g=$('photos');g.innerHTML='';S.photos.forEach((p,i)=>{let d=document.createElement('div');d.className='photo'+(i===S.i?' active':'');d.innerHTML='<img src="'+p.url+'"><span class="tag">Photo '+(i+1)+'</span><button class="remove">×</button>';d.onclick=()=>select(i);d.querySelector('.remove').onclick=e=>{e.stopPropagation();remove(i)};g.appendChild(d)});stats()}
+function select(i){S.i=i;S.rot=0;S.flip=false;$('bright').value=100;$('contrast').value=100;drawPhotos();render()}
+function remove(i){URL.revokeObjectURL(S.photos[i].url);S.photos.splice(i,1);S.i=Math.max(0,Math.min(S.i,S.photos.length-1));drawPhotos();S.photos.length?render():blank()}
+function clearPhotos(reset=true){S.photos.forEach(p=>URL.revokeObjectURL(p.url));S.photos=[];S.i=0;$('photos').innerHTML='';$('rec').style.display='none';if(reset)$('files').value='';blank();stats()}
+function blank(){let c=$('canvas'),x=c.getContext('2d');c.width=600;c.height=600;x.fillStyle='#101812';x.fillRect(0,0,600,600);x.fillStyle='#789';x.font='20px system-ui';x.textAlign='center';x.fillText('Select a photo',300,305)}
+function render(){let p=S.photos[S.i];if(!p)return;let im=p.img,c=$('canvas'),r=Math.min(1,1100/Math.max(im.naturalWidth,im.naturalHeight)),w=im.naturalWidth*r,h=im.naturalHeight*r,rr=S.rot%180!==0;c.width=rr?h:w;c.height=rr?w:h;let x=c.getContext('2d');x.save();x.translate(c.width/2,c.height/2);x.rotate(S.rot*Math.PI/180);x.scale(S.flip?-1:1,1);x.filter='brightness('+$('bright').value+'%) contrast('+$('contrast').value+'%)';x.drawImage(im,-w/2,-h/2,w,h);x.restore()}
+function rotate(){S.rot=(S.rot+90)%360;render()}function flip(){S.flip=!S.flip;render()}function resetEdit(){S.rot=0;S.flip=false;$('bright').value=100;$('contrast').value=100;render()}
+function saveEdited(){if(!S.photos.length)return toast('Select a photo first.');let a=document.createElement('a');a.href=$('canvas').toDataURL('image/jpeg',.94);a.download='gm-edited-photo.jpg';a.click();toast('Edited photo saved.')}
+function b64(file){return new Promise((r,j)=>{let f=new FileReader();f.onload=()=>r(f.result);f.onerror=j;f.readAsDataURL(file)})}
 
-const $=id=>document.getElementById(id);
-
-function go(page){
-document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id===page));
-document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.page===page));
-window.scrollTo({top:0,behavior:"smooth"});
-updateStats();
-}
-
-function toast(text){
-const t=$("toast");
-t.textContent=text;
-t.classList.add("show");
-clearTimeout(window.__toast);
-window.__toast=setTimeout(()=>t.classList.remove("show"),2400);
-}
-
-function openModal(id){$(id).classList.add("show")}
-function closeModal(id){$(id).classList.remove("show")}
-function backdrop(e,id){if(e.target.id===id)closeModal(id)}
-
-function getEvents(){
-try{return JSON.parse(localStorage.getItem("gmEvents")||"[]")}
-catch(e){return[]}
-}
-
-function saveEvents(x){localStorage.setItem("gmEvents",JSON.stringify(x))}
-
-function updateStats(){
-$("sPending").textContent=$("recommendation").classList.contains("show")?1:0;
-$("sPlanned").textContent=getEvents().length;
-$("sApproved").textContent=state.approved;
-if($("aApproved"))$("aApproved").textContent=state.approved;
-if($("aPlanned"))$("aPlanned").textContent=getEvents().length;
-if($("aPhotos"))$("aPhotos").textContent=state.photos.length;
-}
-
-$("photoInput").addEventListener("change",async e=>{
-clearPhotos(false);
-const files=[...e.target.files].filter(f=>f.type.startsWith("image/")).slice(0,3);
-
-for(let i=0;i<files.length;i++){
-const file=files[i];
-const url=URL.createObjectURL(file);
-const img=await loadImage(url);
-state.photos.push({
-file,url,img,
-width:img.naturalWidth,
-height:img.naturalHeight,
-index:i+1
-});
-}
-renderPhotos();
-if(state.photos.length)selectEditor(0);
-if(e.target.files.length>3)toast("GM uses a maximum of 3 photos.");
-});
-
-function loadImage(src){
-return new Promise((resolve,reject)=>{
-const img=new Image();
-img.onload=()=>resolve(img);
-img.onerror=reject;
-img.src=src;
-});
-}
-
-function renderPhotos(){
-const g=$("photoGrid");
-g.innerHTML="";
-state.photos.forEach((p,i)=>{
-const d=document.createElement("div");
-d.className="photo"+(i===state.editorIndex?" active":"");
-d.innerHTML=
-'<img src="'+p.url+'" alt="Photo '+(i+1)+'">'+
-'<span class="tag">Photo '+(i+1)+'</span>'+
-'<button class="remove" onclick="event.stopPropagation();removePhoto('+i+')">×</button>';
-d.onclick=()=>selectEditor(i);
-g.appendChild(d);
-});
-updateStats();
-}
-
-function selectEditor(i){
-if(!state.photos[i])return;
-state.editorIndex=i;
-state.rotation=0;
-state.flip=false;
-$("brightness").value=100;
-$("contrast").value=100;
-document.querySelectorAll(".photo").forEach((x,n)=>x.classList.toggle("active",n===i));
-renderEditor();
-}
-
-function removePhoto(i){
-if(state.photos[i])URL.revokeObjectURL(state.photos[i].url);
-state.photos.splice(i,1);
-state.editorIndex=Math.max(0,Math.min(state.editorIndex,state.photos.length-1));
-renderPhotos();
-if(state.photos.length)renderEditor();
-else clearEditor();
-}
-
-function clearPhotos(resetInput=true){
-state.photos.forEach(p=>URL.revokeObjectURL(p.url));
-state.photos=[];
-state.editorIndex=0;
-$("photoGrid").innerHTML="";
-$("recommendation").classList.remove("show");
-if(resetInput)$("photoInput").value="";
-clearEditor();
-updateStats();
-}
-
-function clearEditor(){
-const c=$("editorCanvas");
-c.width=600;c.height=600;
-const ctx=c.getContext("2d");
-ctx.fillStyle="#101812";ctx.fillRect(0,0,c.width,c.height);
-ctx.fillStyle="#789";ctx.font="20px system-ui";ctx.textAlign="center";
-ctx.fillText("Select a photo",300,305);
-}
-
-function renderEditor(){
-const p=state.photos[state.editorIndex];
-if(!p)return;
-
-const c=$("editorCanvas");
-const img=p.img;
-const rotated=state.rotation%180!==0;
-const max=1100;
-let w=img.naturalWidth,h=img.naturalHeight;
-const scale=Math.min(1,max/Math.max(w,h));
-w=Math.round(w*scale);h=Math.round(h*scale);
-
-c.width=rotated?h:w;
-c.height=rotated?w:h;
-
-const ctx=c.getContext("2d");
-ctx.save();
-ctx.translate(c.width/2,c.height/2);
-ctx.rotate(state.rotation*Math.PI/180);
-ctx.scale(state.flip?-1:1,1);
-
-const filter="brightness("+$("brightness").value+"%) contrast("+$("contrast").value+"%)";
-ctx.filter=filter;
-ctx.drawImage(img,-w/2,-h/2,w,h);
-ctx.restore();
-}
-
-function rotateEditor(){
-state.rotation=(state.rotation+90)%360;
-renderEditor();
-}
-
-function flipEditor(){
-state.flip=!state.flip;
-renderEditor();
-}
-
-function resetEditor(){
-state.rotation=0;
-state.flip=false;
-$("brightness").value=100;
-$("contrast").value=100;
-renderEditor();
-}
-
-function downloadEdited(){
-if(!state.photos.length){toast("Select a photo first.");return}
-renderEditor();
-const a=document.createElement("a");
-a.href=$("editorCanvas").toDataURL("image/jpeg",.94);
-a.download="gm-edited-photo.jpg";
-a.click();
-toast("Edited photo saved.");
-}
-
-function recommend(){
-const chosen=state.photos;
-if(!chosen.length){toast("Select at least one photo first.");return}
-
-let best=chosen[0],bestScore=-1;
-
-chosen.forEach((p)=>{
-let score=60;
-const pixels=p.width*p.height;
-if(pixels>=2000000)score+=12;
-if(pixels>=5000000)score+=8;
-if(p.width>=p.height)score+=5;
-if(p.width/p.height>=.65 && p.width/p.height<=1.5)score+=4;
-if(p.file.size>400000)score+=3;
-score=Math.min(96,score);
-p.score=score;
-if(score>bestScore){best=p;bestScore=score}
-});
-
-const idx=chosen.indexOf(best)+1;
-$("bestImg").src=best.url;
-$("score").textContent=best.score+"/100";
-$("bestName").textContent="Photo "+idx+" is the strongest starting choice";
-$("bestWhy").textContent=
-"GM selected this photo from the available local image properties. "+
-"It has a strong resolution/composition starting point. Final creative judgment should still be yours.";
-
-$("recAesthetic").textContent="Clean + premium + natural";
-$("recPose").textContent="Relaxed posture; natural shoulders and comfortable hands.";
-$("recComposition").textContent=best.width>=best.height?
-"Keep breathing room around the subject and avoid an overly tight crop.":
-"Use a balanced vertical crop with the subject clearly framed.";
-$("recEditing").textContent="Subtle brightness/contrast only; keep realistic skin texture and natural colors.";
-$("recMusic").textContent="Choose a calm, confident track matching the mood rather than chasing a trend.";
-$("recTime").textContent="Starter window: 7:00–9:00 PM local time. Real audience data is required for a true personalized time.";
-$("recCaption").value=makeCaption();
-
-$("recClock").textContent=new Date().toLocaleTimeString([],{
-hour:"2-digit",minute:"2-digit"
-});
-
-$("recommendation").classList.add("show");
-updateStats();
-toast("GM recommendation prepared.");
-}
-
-function makeCaption(){
-const p=loadProfileObject();
-const style=(p&&p.communication||"").toLowerCase();
-
-if(style.includes("short"))return"Keeping it simple. ✨";
-if(style.includes("confident"))return"Good energy. No extra explanation needed.";
-if(style.includes("casual"))return"Just a good moment.";
-return"Simple mood. Good energy. ✨";
-}
-
-function approve(){
-if(!$("recommendation").classList.contains("show")){
-toast("Create a recommendation first.");return;
-}
-state.approved++;
-localStorage.setItem("gmApproved",state.approved);
-updateStats();
-toast("Approved. GM will not publish automatically.");
-}
-
-function addEvent(){
-const title=$("eventTitle").value.trim();
-if(!title){toast("Add a title.");return}
-
-const arr=getEvents();
-arr.push({
-type:$("eventType").value,
-date:$("eventDate").value||"No date",
-time:$("eventTime").value||"",
-title,
-notes:$("eventNotes").value||""
-});
-saveEvents(arr);
-
-$("eventTitle").value="";
-$("eventNotes").value="";
-renderEvents();
-closeModal("plannerModal");
-toast("Added to planner.");
-}
-
-function renderEvents(){
-const box=$("events");
-const arr=getEvents();
-
-if(!arr.length){
-box.innerHTML='<div class="empty">No planned content yet.<br><br>Tap ＋ Add to create your first item.</div>';
-updateStats();
-return;
-}
-
-box.innerHTML="";
-arr.forEach((e,i)=>{
-const d=document.createElement("div");
-d.className="event";
-d.innerHTML=
-"<strong>"+escapeHTML(e.type)+" · "+escapeHTML(e.title)+"</strong>"+
-"<small>"+escapeHTML(e.date)+(e.time?" · "+escapeHTML(e.time):"")+
-"</small>"+
-(e.notes?"<div style='margin-top:7px;color:#aebcb4;font-size:12px'>"+escapeHTML(e.notes)+"</div>":"")+
-"<div class='actions'><button class='btn danger small' onclick='deleteEvent("+i+")'>Delete</button></div>";
-box.appendChild(d);
-});
-updateStats();
-}
-
-function deleteEvent(i){
-const arr=getEvents();
-arr.splice(i,1);
-saveEvents(arr);
-renderEvents();
-toast("Removed.");
-}
-
-function escapeHTML(v){
-return String(v).replace(/[&<>"']/g,m=>({
-"&":"&amp;","<":"&lt;",">":"&gt;",
-'"':"&quot;","'":"&#039;"
-}[m]));
-}
-
-function makeCollage(){
-const photos=state.photos;
-if(photos.length<2){
-toast("Select at least 2 photos in Content first.");
-return;
-}
-
-const use=photos.slice(0,3);
-const c=$("collage"),ctx=c.getContext("2d");
-const W=1080,H=1080;
-c.width=W;c.height=H;
-ctx.fillStyle="#101812";
-ctx.fillRect(0,0,W,H);
-
-const cells=use.length===2?
-[[0,0,540,1080],[540,0,540,1080]]:
-[[0,0,540,540],[540,0,540,540],[0,540,1080,540]];
-
-let loaded=0;
-
-use.forEach((p,i)=>{
-const im=p.img;
-const [x,y,w,h]=cells[i];
-const r=Math.max(w/im.naturalWidth,h/im.naturalHeight);
-const nw=im.naturalWidth*r,nh=im.naturalHeight*r;
-ctx.drawImage(im,x+(w-nw)/2,y+(h-nh)/2,nw,nh);
-loaded++;
-
-if(loaded===use.length){
-c.style.display="block";
-const a=$("collageSave");
-a.href=c.toDataURL("image/png");
-a.style.display="block";
-toast("Collage created.");
-}
-});
-}
-
-async function runAIEdit(){
-const endpoint=$("aiEndpoint").value.trim();
-if(!endpoint){
-toast("Enter your AI backend endpoint first.");
-$("aiStatus").textContent="No endpoint configured.";
-return;
-}
-if(!state.photos.length){
-toast("Select a photo first.");
-return;
-}
-
-const p=state.photos[state.editorIndex];
-const status=$("aiStatus");
-status.textContent="Sending image to your AI editing service…";
-
+async function analyze(){
+if(!S.photos.length)return toast('Select at least one photo.');
+let status=$('poseStatus');status.textContent='GM AI is analyzing your photos…';
 try{
-const base64=await blobToBase64(p.file);
-
-const payload={
-image:base64,
-filename:p.file.name,
-prompt:$("posePrompt").value,
-rules:{
-preserveIdentity:true,
-preserveFaceStructure:true,
-preserveBodyProportions:true,
-naturalAppearance:true,
-avoidUnnecessaryBackgroundReplacement:true
-}
-};
-
-const response=await fetch(endpoint,{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify(payload)
-});
-
-if(!response.ok)throw new Error("HTTP "+response.status);
-
-const data=await response.json();
-
-const result=data.image||data.image_url||data.url||data.result;
-
-if(!result)throw new Error("The API did not return an image.");
-
-$("aiResult").src=result;
-$("aiResult").style.display="block";
-$("aiDownload").href=result;
-$("aiDownload").style.display="inline-block";
-status.textContent="AI pose edit received successfully.";
-toast("AI edited result received.");
-
-}catch(err){
-console.error(err);
-status.textContent=
-"AI edit failed: "+err.message+
-". Check your endpoint and its response format.";
-toast("AI service connection failed.");
-}
+let images=await Promise.all(S.photos.map(p=>b64(p.file)));
+let r=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({images})});
+let d=await r.json();if(!r.ok)throw Error(d.error||'AI analysis failed');
+let a=d.result||d;
+let best=Math.max(0,Math.min(S.photos.length-1,+a.bestIndex||0));
+$('best').src=S.photos[best].url;$('score').textContent=(a.score||'—')+'/100';$('bestTitle').textContent='Photo '+(best+1)+' is GM’s best choice';$('why').textContent=a.why||'Strongest overall choice.';
+$('aesthetic').textContent=a.aesthetic||'Clean + premium + natural';$('poseTip').textContent=a.pose||'Relaxed, natural posture.';$('composition').textContent=a.composition||'Balanced crop with breathing room.';$('editing').textContent=a.editing||'Subtle natural correction only.';$('music').textContent=a.music||'Choose music matching the mood.';$('time').textContent=a.postingTime||'7:00–9:00 PM local time';$('caption').value=a.caption||'Simple mood. Good energy. ✨';$('rec').style.display='block';status.textContent='AI analysis complete.';toast('GM recommendation ready.');stats();
+}catch(e){status.textContent=e.message;toast('AI analysis needs the backend/API key.')}
 }
 
-function blobToBase64(file){
-return new Promise((resolve,reject)=>{
-const r=new FileReader();
-r.onload=()=>resolve(r.result);
-r.onerror=reject;
-r.readAsDataURL(file);
-});
+async function poseEdit(){
+if(!S.photos.length)return toast('Select a photo first.');
+$('poseStatus').textContent='GM is generating the natural pose…';$('poseSave').style.display='none';
+try{
+let image=await b64(S.photos[S.i].file);
+let r=await fetch('/api/edit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image,prompt:$('pose').value})});
+let d=await r.json();if(!r.ok)throw Error(d.error||'Pose generation failed');
+let src=d.image;if(!src)throw Error('No generated image returned');
+$('poseResult').src=src;$('poseResult').style.display='block';$('poseSave').href=src;$('poseSave').style.display='block';$('poseStatus').textContent='Generated successfully.';toast('Natural pose generated.');
+}catch(e){$('poseStatus').textContent=e.message;toast('Pose generation could not be completed.')}
 }
 
-function saveEndpoint(){
-const value=$("aiEndpoint").value.trim();
-localStorage.setItem("gmAIEndpoint",value);
-toast("AI endpoint saved on this device.");
-}
-
-function loadEndpoint(){
-$("aiEndpoint").value=localStorage.getItem("gmAIEndpoint")||"";
-}
-
-function saveProfile(){
-const data={
-style:$("profileStyle").value,
-communication:$("profileCommunication").value,
-clothing:$("profileClothing").value,
-photo:$("profilePhoto").value,
-music:$("profileMusic").value
-};
-localStorage.setItem("gmProfile",JSON.stringify(data));
-toast("GM Profile saved.");
-}
-
-function loadProfileObject(){
-try{return JSON.parse(localStorage.getItem("gmProfile")||"null")}
-catch(e){return null}
-}
-
-function loadProfile(){
-const p=loadProfileObject();
-if(!p)return;
-$("profileStyle").value=p.style||$("profileStyle").value;
-$("profileCommunication").value=p.communication||"";
-$("profileClothing").value=p.clothing||"";
-$("profilePhoto").value=p.photo||"";
-$("profileMusic").value=p.music||"";
-}
-
-renderEvents();
-loadProfile();
-loadEndpoint();
-clearEditor();
-updateStats();
+function events(){try{return JSON.parse(localStorage.getItem('gmEvents')||'[]')}catch{return[]}}
+function saveEvents(a){localStorage.setItem('gmEvents',JSON.stringify(a))}
+function addEvent(){if(!$('etitle').value.trim())return toast('Add a title.');let a=events();a.push({type:$('etype').value,date:$('edate').value||'No date',time:$('etime').value,title:$('etitle').value,notes:$('enotes').value});saveEvents(a);$('etitle').value='';$('enotes').value='';closeM('plannerM');renderEvents();toast('Added to planner.')}
+function renderEvents(){let b=$('events'),a=events();if(!a.length){b.innerHTML='<div class="empty">No planned content yet.<br><br>Tap ＋ Add.</div>';stats();return}b.innerHTML=a.map((e,i)=>'<div class="event"><b>'+esc(e.type)+' · '+esc(e.title)+'</b><br><small>'+esc(e.date)+(e.time?' · '+esc(e.time):'')+'</small>'+(e.notes?'<div style="margin-top:7px;color:#aebcb4;font-size:12px">'+esc(e.notes)+'</div>':'')+'<div class="actions"><button class="btn danger small" onclick="delEvent('+i+')">Delete</button></div></div>').join('');stats()}
+function delEvent(i){let a=events();a.splice(i,1);saveEvents(a);renderEvents();toast('Removed.')}
+function esc(v){return String(v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function approve(){if($('rec').style.display==='none')return toast('Run GM AI Analysis first.');S.approved++;localStorage.setItem('gmApproved',S.approved);stats();toast('Approved. GM never auto-posts.')}
+function stats(){$('pending').textContent=$('rec').style.display==='block'?1:0;$('planned').textContent=events().length;$('approved').textContent=S.approved;if($('aa'))$('aa').textContent=S.approved;if($('ap'))$('ap').textContent=events().length;if($('aph'))$('aph').textContent=S.photos.length}
+function collage(){if(S.photos.length<2)return toast('Select 2–3 photos first.');let c=$('collage'),x=c.getContext('2d'),W=1080,H=1080;c.width=W;c.height=H;x.fillStyle='#101812';x.fillRect(0,0,W,H);let cells=S.photos.length===2?[[0,0,540,1080],[540,0,540,1080]]:[[0,0,540,540],[540,0,540,540],[0,540,1080,540]];S.photos.forEach((p,i)=>{let [px,py,w,h]=cells[i],im=p.img,r=Math.max(w/im.naturalWidth,h/im.naturalHeight),nw=im.naturalWidth*r,nh=im.naturalHeight*r;x.drawImage(im,px+(w-nw)/2,py+(h-nh)/2,nw,nh)});c.style.display='block';$('collageSave').href=c.toDataURL('image/png');$('collageSave').style.display='block';toast('Collage created.')}
+function saveProfile(){localStorage.setItem('gmProfile',JSON.stringify({style:$('style').value,communication:$('communication').value,clothing:$('clothing').value,photo:$('photoPref').value,music:$('musicPref').value}));toast('GM Profile saved.')}
+function loadProfile(){try{let p=JSON.parse(localStorage.getItem('gmProfile')||'null');if(!p)return;$('style').value=p.style||$('style').value;$('communication').value=p.communication||'';$('clothing').value=p.clothing||'';$('photoPref').value=p.photo||'';$('musicPref').value=p.music||''}catch{}}
+renderEvents();loadProfile();blank();stats();
 </script>
 </body>
 </html>
