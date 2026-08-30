@@ -1,137 +1,168 @@
 export default async function handler(req, res) {
+  res.setHeader("Content-Type", "application/json");
+
   if (req.method !== "POST") {
-    return res.status(405).json({
+    return res.status(405).end(JSON.stringify({
       error: "Method not allowed"
-    });
+    }));
   }
 
-  const key = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
 
-  if (!key) {
-    return res.status(500).json({
-      error: "GEMINI_API_KEY is not configured in Vercel."
-    });
+  if (!apiKey) {
+    return res.status(500).end(JSON.stringify({
+      error: "GEMINI_API_KEY is missing in Vercel."
+    }));
   }
 
   try {
     const { image, prompt } = req.body || {};
 
-    const match = String(image || "").match(
+    if (!image) {
+      return res.status(400).end(JSON.stringify({
+        error: "No photo was supplied."
+      }));
+    }
+
+    const match = String(image).match(
       /^data:(image\/[^;]+);base64,(.+)$/
     );
 
     if (!match) {
-      return res.status(400).json({
-        error: "A valid image is required."
-      });
+      return res.status(400).end(JSON.stringify({
+        error: "Invalid photo format."
+      }));
     }
 
-    if (match[2].length > 14000000) {
-      return res.status(413).json({
-        error: "Image is too large. Please use a smaller photo."
-      });
-    }
+    const mimeType = match[1];
+    const base64Image = match[2];
 
     const instruction = `
-${prompt || "Change the person's pose to a natural and relaxed pose."}
+GM Manager Natural Pose Editor.
 
-GM MANAGER — STRICT PHOTO RULES:
+Change ONLY the person's pose.
 
-1. Preserve the exact person's identity.
-2. Do NOT change facial identity.
-3. Do NOT change face structure.
-4. Do NOT slim, enlarge, reshape or modify the person's body.
-5. Do NOT change body proportions.
-6. Do NOT change body size or shape.
-7. Preserve clothing.
-8. Preserve hairstyle.
-9. Preserve natural skin texture.
-10. Keep the original background/environment as much as possible.
-11. Do not replace the environment unnecessarily.
-12. Only change the requested pose.
-13. Keep lighting realistic.
-14. Keep colors natural.
-15. Do not add unrelated people or objects.
-16. The final result must look like a genuine camera photograph.
-17. Avoid an obvious AI-generated appearance.
+STRICT REQUIREMENTS:
+- Preserve the exact identity of the person.
+- Preserve the face and facial identity.
+- Do not change facial structure.
+- Do not change body size.
+- Do not change body shape.
+- Do not change body proportions.
+- Do not slim or enlarge the person.
+- Preserve clothing.
+- Preserve hairstyle.
+- Preserve skin appearance.
+- Preserve the original environment and background.
+- Do not replace the background.
+- Do not add unrelated people or objects.
+- Keep realistic lighting.
+- Keep realistic shadows.
+- Make the result look like a genuine photograph.
+- Avoid an obvious AI-generated appearance.
 
-The requested pose should look physically realistic and natural.
+The new pose must be physically realistic and natural.
+
+User's requested pose:
+${prompt || "Make the pose look more natural, relaxed and confident."}
 `;
 
     const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1/models/gemini-3.1-flash-image:generateContent",
+      "https://generativelanguage.googleapis.com/v1beta/interactions",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-goog-api-key": key
+          "x-goog-api-key": apiKey
         },
         body: JSON.stringify({
-          contents: [
+          model: "gemini-3.1-flash-image",
+          input: [
             {
-              parts: [
-                {
-                  inline_data: {
-                    mime_type: match[1],
-                    data: match[2]
-                  }
-                },
-                {
-                  text: instruction
-                }
-              ]
+              type: "image",
+              data: base64Image,
+              mime_type: mimeType
+            },
+            {
+              type: "text",
+              text: instruction
             }
           ],
-          generationConfig: {
-            responseModalities: ["IMAGE"]
+          response_format: {
+            type: "image"
           }
         })
       }
     );
 
-    const data = await response.json();
+    const raw = await response.text();
+
+    let data;
+
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      return res.status(502).end(JSON.stringify({
+        error: "Gemini returned an invalid response."
+      }));
+    }
 
     if (!response.ok) {
-      return res.status(response.status).json({
+      return res.status(response.status).end(JSON.stringify({
         error:
           data?.error?.message ||
           "Gemini image editing failed."
-      });
+      }));
     }
 
-    const parts =
-      data?.candidates?.[0]?.content?.parts || [];
+    let generatedImage = null;
+    let generatedMime = "image/png";
 
-    const imagePart = parts.find(
-      part =>
-        part?.inlineData?.data ||
-        part?.inline_data?.data
-    );
-
-    const base64 =
-      imagePart?.inlineData?.data ||
-      imagePart?.inline_data?.data;
-
-    const mimeType =
-      imagePart?.inlineData?.mimeType ||
-      imagePart?.inline_data?.mime_type ||
-      "image/png";
-
-    if (!base64) {
-      throw new Error(
-        "The image model did not return an edited image."
-      );
+    if (data?.output_image?.data) {
+      generatedImage = data.output_image.data;
+      generatedMime =
+        data.output_image.mime_type || "image/png";
     }
 
-    return res.status(200).json({
-      image: `data:${mimeType};base64,${base64}`
-    });
+    if (!generatedImage && Array.isArray(data?.steps)) {
+      for (const step of data.steps) {
+        if (
+          step?.type === "model_output" &&
+          Array.isArray(step.content)
+        ) {
+          for (const block of step.content) {
+            if (
+              block?.type === "image" &&
+              block?.data
+            ) {
+              generatedImage = block.data;
+              generatedMime =
+                block.mime_type || "image/png";
+              break;
+            }
+          }
+        }
+
+        if (generatedImage) break;
+      }
+    }
+
+    if (!generatedImage) {
+      return res.status(502).end(JSON.stringify({
+        error:
+          "Gemini completed the request but did not return an edited image."
+      }));
+    }
+
+    return res.status(200).end(JSON.stringify({
+      image: `data:${generatedMime};base64,${generatedImage}`
+    }));
 
   } catch (error) {
-    return res.status(500).json({
+    return res.status(500).end(JSON.stringify({
       error:
         error?.message ||
-        "GM image editing failed."
-    });
+        "GM natural pose generation failed."
+    }));
   }
 }
